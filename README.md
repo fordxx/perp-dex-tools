@@ -14,6 +14,84 @@
 
 一个支持多个交易所（目前包括 EdgeX, Backpack, Paradex, Aster, Lighter, grvt, Extended）的模块化交易机器人。该机器人实现了自动下单并在盈利时自动平仓的策略，主要目的是取得高交易量。
 
+## 🔔 价格提醒系统 (Price Alert System) - NEW!
+
+**全新功能**：智能价格监控和提醒系统，支持多种条件和自动化操作！
+
+### 主要功能
+- ✅ **实时价格监控** - 监控多个交易所的加密货币价格
+- ✅ **灵活的提醒条件** - 价格突破、区间、百分比变化、跨交易所价差、波动率等
+- ✅ **多种通知方式** - Telegram、Lark、控制台、音频、Webhook
+- ✅ **自动交易触发** - 价格达到时自动启动交易机器人
+- ✅ **提醒历史记录** - 完整的提醒历史和统计分析
+- ✅ **YAML 配置管理** - 简单易用的配置文件
+
+### 快速开始
+
+**使用配置文件：**
+```bash
+python run_price_alert.py --config config/alerts/btc_alerts.yaml
+```
+
+**快速命令行提醒：**
+```bash
+# BTC 突破 65000 时提醒
+python run_price_alert.py --exchange edgex --ticker BTC --price-above 65000
+
+# ETH 跌破 3200 时提醒（带 Telegram 通知）
+python run_price_alert.py --exchange edgex --ticker ETH --price-below 3200 --channels telegram
+```
+
+### 配置示例
+
+```yaml
+alerts:
+  # 基础价格突破提醒
+  - name: "BTC突破65000"
+    exchange: "edgex"
+    ticker: "BTC"
+    conditions:
+      - type: "price_above"
+        value: 65000
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "🚀 BTC突破$65,000!"
+
+  # 跨交易所套利机会
+  - name: "BTC套利机会"
+    exchanges: ["edgex", "backpack"]
+    ticker: "BTC"
+    conditions:
+      - type: "price_spread"
+        value: 50  # 价差超过$50
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "💰 发现套利机会！"
+
+  # 自动交易触发（谨慎使用）
+  - name: "ETH自动买入"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: false  # 默认禁用
+    conditions:
+      - type: "price_below"
+        value: 3100
+    actions:
+      - type: "execute_bot"
+        command: "python runbot.py --exchange edgex --ticker ETH --quantity 0.1 --direction buy"
+```
+
+### 详细文档
+
+完整使用指南请查看：[价格提醒系统使用指南](docs/PRICE_ALERT_GUIDE.md)
+
+配置示例文件：
+- `config/alerts/btc_alerts.yaml` - BTC 价格提醒配置
+- `config/alerts/eth_alerts.yaml` - ETH 价格提醒配置
+- `config/alerts/example_alerts.yaml` - 通用配置模板
+
 ## 邀请链接 (获得返佣以及福利)
 
 #### EdgeX: [https://pro.edgex.exchange/referral/QUANT](https://pro.edgex.exchange/referral/QUANT)

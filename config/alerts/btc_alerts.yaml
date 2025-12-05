@@ -1,0 +1,143 @@
+# BTC Price Alert Configuration
+# 示例配置文件：BTC价格提醒
+
+# 全局设置
+check_interval: 10  # 检查间隔（秒）
+enable_sound: true
+enable_terminal_ui: true
+log_level: "INFO"
+
+# 提醒规则列表
+alerts:
+  # 基础价格提醒 - BTC突破65000
+  - name: "BTC突破65000"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: false  # 只触发一次
+    cooldown: 300  # 冷却时间（秒）
+    conditions:
+      - type: "price_above"
+        value: 65000
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "🚀 BTC突破$65,000! 当前价格: ${price}"
+      - type: "sound"
+        enabled: true
+
+  # 基础价格提醒 - BTC跌破60000
+  - name: "BTC跌破60000"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: false
+    cooldown: 300
+    conditions:
+      - type: "price_below"
+        value: 60000
+    actions:
+      - type: "notify"
+        channels: ["telegram", "lark", "console"]
+        message: "⚠️ BTC跌破$60,000! 当前价格: ${price}"
+      - type: "sound"
+        enabled: true
+
+  # 价格区间提醒 - BTC进入目标买入区间
+  - name: "BTC进入买入区间"
+    exchange: "backpack"
+    ticker: "BTC"
+    enabled: true
+    repeat: true  # 可以重复触发
+    cooldown: 3600  # 1小时冷却
+    conditions:
+      - type: "price_range"
+        min_value: 58000
+        max_value: 60000
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "💰 BTC进入买入区间 [$58,000 - $60,000]，当前价格: ${price}"
+
+  # 百分比变化提醒 - BTC 1小时涨幅超过3%
+  - name: "BTC快速上涨"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 1800  # 30分钟冷却
+    conditions:
+      - type: "percent_change"
+        percent: 3
+        timeframe: "1h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "📈 BTC 1小时涨幅超过3%！当前价格: ${price}"
+
+  # 百分比变化提醒 - BTC快速下跌
+  - name: "BTC快速下跌"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 1800
+    conditions:
+      - type: "percent_change"
+        percent: -3
+        timeframe: "1h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "📉 BTC 1小时跌幅超过3%！当前价格: ${price}"
+      - type: "sound"
+        enabled: true
+
+  # 跨交易所价差提醒 - 套利机会
+  - name: "BTC套利机会"
+    exchanges: ["edgex", "backpack"]
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 600  # 10分钟冷却
+    conditions:
+      - type: "price_spread"
+        value: 50  # 价差超过$50
+        comparison_exchange: "backpack"
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "💰 BTC跨交易所价差机会！价差超过$50"
+
+  # 自动交易触发 - BTC到达买入价格时启动交易机器人
+  - name: "BTC自动买入触发"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: false  # 默认禁用，谨慎使用
+    repeat: false
+    cooldown: 3600
+    conditions:
+      - type: "price_below"
+        value: 59000
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "🤖 BTC达到买入价格，启动交易机器人..."
+      - type: "execute_bot"
+        command: "python runbot.py --exchange edgex --ticker BTC --quantity 0.05 --take-profit 0.02 --max-orders 20 --direction buy"
+
+  # 波动率提醒 - BTC高波动警告
+  - name: "BTC高波动率警告"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 3600
+    conditions:
+      - type: "volatility"
+        percent: 2  # 波动率超过2%
+        timeframe: "1h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "⚡ BTC波动率异常！1小时波动率超过2%"

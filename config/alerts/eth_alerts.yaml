@@ -1,0 +1,207 @@
+# ETH Price Alert Configuration
+# 示例配置文件：ETH价格提醒
+
+# 全局设置
+check_interval: 5  # 检查间隔（秒）- ETH变化更快，缩短间隔
+enable_sound: true
+enable_terminal_ui: true
+log_level: "INFO"
+
+# 提醒规则列表
+alerts:
+  # 突破关键价格位 - 3500
+  - name: "ETH突破3500"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: false
+    cooldown: 300
+    conditions:
+      - type: "price_above"
+        value: 3500
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "🚀 ETH突破$3,500! 当前价格: ${price}"
+      - type: "sound"
+        enabled: true
+
+  # 跌破关键支撑位 - 3200
+  - name: "ETH跌破3200"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: false
+    cooldown: 300
+    conditions:
+      - type: "price_below"
+        value: 3200
+    actions:
+      - type: "notify"
+        channels: ["telegram", "lark", "console"]
+        message: "⚠️ ETH跌破$3,200支撑位! 当前价格: ${price}"
+      - type: "sound"
+        enabled: true
+
+  # 买入区间提醒
+  - name: "ETH买入机会"
+    exchange: "backpack"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 7200  # 2小时冷却
+    conditions:
+      - type: "price_range"
+        min_value: 3100
+        max_value: 3200
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "💰 ETH进入理想买入区间 [$3,100 - $3,200]，当前: ${price}"
+
+  # 快速上涨提醒 - 5分钟涨幅2%
+  - name: "ETH短期快速上涨"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 900  # 15分钟冷却
+    conditions:
+      - type: "percent_change"
+        percent: 2
+        timeframe: "5m"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "📈 ETH 5分钟涨幅超过2%！当前价格: ${price} - 关注突破"
+
+  # 快速下跌提醒 - 5分钟跌幅2%
+  - name: "ETH短期快速下跌"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 900
+    conditions:
+      - type: "percent_change"
+        percent: -2
+        timeframe: "5m"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "📉 ETH 5分钟跌幅超过2%！当前价格: ${price} - 注意风险"
+      - type: "sound"
+        enabled: true
+
+  # 1小时大涨提醒
+  - name: "ETH 1小时大涨"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 1800
+    conditions:
+      - type: "percent_change"
+        percent: 4
+        timeframe: "1h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "lark"]
+        message: "🔥 ETH 1小时涨幅超过4%！当前: ${price} - 强势突破"
+
+  # 跨交易所套利机会
+  - name: "ETH套利机会"
+    exchanges: ["edgex", "backpack"]
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 600
+    conditions:
+      - type: "price_spread"
+        value: 10  # 价差超过$10
+        comparison_exchange: "backpack"
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "💰 ETH跨交易所价差超过$10！立即查看套利机会"
+
+  # 三个交易所价格监控（多交易所）
+  - name: "ETH多交易所价格监控"
+    exchanges: ["edgex", "backpack", "aster"]
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 600
+    conditions:
+      - type: "price_above"
+        value: 3400
+    actions:
+      - type: "notify"
+        channels: ["console"]
+        message: "📊 ETH在多个交易所突破$3,400"
+
+  # 自动交易 - 逢低买入（谨慎使用）
+  - name: "ETH自动逢低买入"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: false  # 默认禁用
+    repeat: false
+    cooldown: 7200
+    conditions:
+      - type: "price_below"
+        value: 3150
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "🤖 ETH到达买入价格 $3,150，启动交易机器人"
+      - type: "execute_bot"
+        command: "python runbot.py --exchange edgex --ticker ETH --quantity 0.1 --take-profit 0.02 --max-orders 30 --direction buy"
+
+  # 自动对冲模式（谨慎使用）
+  - name: "ETH自动对冲模式"
+    exchange: "backpack"
+    ticker: "ETH"
+    enabled: false  # 默认禁用
+    repeat: false
+    cooldown: 3600
+    conditions:
+      - type: "price_above"
+        value: 3450
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "🤖 ETH突破$3,450，启动对冲模式"
+      - type: "execute_bot"
+        command: "python hedge_mode.py --exchange backpack --ticker ETH --size 0.1 --iter 10"
+
+  # 高波动率警告
+  - name: "ETH高波动率"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 3600
+    conditions:
+      - type: "volatility"
+        percent: 3
+        timeframe: "1h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "⚡ ETH波动率飙升！1小时波动率超过3% - 市场剧烈波动"
+
+  # 24小时大涨提醒
+  - name: "ETH 24小时强势"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 7200
+    conditions:
+      - type: "percent_change"
+        percent: 10
+        timeframe: "24h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "lark"]
+        message: "🎯 ETH 24小时涨幅超过10%！当前: ${price} - 趋势强劲"

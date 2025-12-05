@@ -1,0 +1,182 @@
+# Example Price Alert Configuration
+# 通用配置文件模板
+
+# 全局设置
+check_interval: 10  # 价格检查间隔（秒）
+enable_sound: true  # 启用音频提醒
+enable_terminal_ui: true  # 启用终端UI
+log_level: "INFO"  # 日志级别: DEBUG, INFO, WARNING, ERROR
+
+# 提醒规则列表
+alerts:
+  # ========================================
+  # 示例1：基础价格提醒 - 价格突破
+  # ========================================
+  - name: "价格突破提醒"
+    exchange: "edgex"  # 交易所名称
+    ticker: "BTC"  # 币种代码
+    enabled: true  # 是否启用
+    repeat: false  # 是否重复触发（false=只触发一次）
+    cooldown: 300  # 冷却时间（秒）
+    priority: 0  # 优先级（数字越大越优先）
+    conditions:
+      - type: "price_above"  # 条件类型
+        value: 65000  # 目标价格
+    actions:
+      - type: "notify"  # 发送通知
+        channels: ["telegram", "console"]  # 通知渠道
+        message: "价格突破目标！{ticker} @ ${price}"  # 自定义消息
+      - type: "sound"  # 播放声音
+        enabled: true
+
+  # ========================================
+  # 示例2：价格区间提醒
+  # ========================================
+  - name: "价格区间提醒"
+    exchange: "backpack"
+    ticker: "ETH"
+    enabled: true
+    repeat: true
+    cooldown: 3600
+    conditions:
+      - type: "price_range"
+        min_value: 3000  # 最小值
+        max_value: 3200  # 最大值
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "{ticker}进入目标区间: ${price}"
+
+  # ========================================
+  # 示例3：百分比变化提醒
+  # ========================================
+  - name: "快速涨跌提醒"
+    exchange: "edgex"
+    ticker: "SOL"
+    enabled: true
+    repeat: true
+    cooldown: 1800
+    conditions:
+      - type: "percent_change"
+        percent: 5  # 正数=上涨，负数=下跌
+        timeframe: "1h"  # 时间范围: 5m, 1h, 24h等
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "{ticker} 1小时涨幅超过5%！"
+
+  # ========================================
+  # 示例4：跨交易所价差提醒（套利机会）
+  # ========================================
+  - name: "套利机会扫描"
+    exchanges: ["edgex", "backpack"]  # 多个交易所
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 600
+    conditions:
+      - type: "price_spread"
+        value: 50  # 最小价差（USDT）
+        comparison_exchange: "backpack"  # 对比交易所
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "发现套利机会！{ticker}价差超过$50"
+
+  # ========================================
+  # 示例5：自动交易触发（谨慎使用！）
+  # ========================================
+  - name: "自动交易触发"
+    exchange: "edgex"
+    ticker: "ETH"
+    enabled: false  # 默认禁用，需要时手动启用
+    repeat: false
+    cooldown: 7200
+    conditions:
+      - type: "price_below"
+        value: 3100
+    actions:
+      - type: "notify"
+        channels: ["telegram"]
+        message: "触发自动交易：{ticker} @ ${price}"
+      - type: "execute_bot"
+        command: "python runbot.py --exchange edgex --ticker ETH --quantity 0.1 --direction buy"
+
+  # ========================================
+  # 示例6：波动率监控
+  # ========================================
+  - name: "波动率警告"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 3600
+    conditions:
+      - type: "volatility"
+        percent: 2  # 波动率阈值（百分比）
+        timeframe: "1h"
+    actions:
+      - type: "notify"
+        channels: ["telegram", "console"]
+        message: "⚡ {ticker}波动率异常：超过2%"
+
+  # ========================================
+  # 示例7：Webhook通知（高级用法）
+  # ========================================
+  - name: "Webhook通知示例"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: false  # 默认禁用
+    repeat: true
+    cooldown: 600
+    conditions:
+      - type: "price_above"
+        value: 65000
+    actions:
+      - type: "webhook"
+        webhook_url: "https://your-webhook-url.com/alerts"
+      - type: "notify"
+        channels: ["console"]
+
+  # ========================================
+  # 示例8：仅日志记录（不发送通知）
+  # ========================================
+  - name: "静默监控"
+    exchange: "edgex"
+    ticker: "BTC"
+    enabled: true
+    repeat: true
+    cooldown: 60
+    conditions:
+      - type: "price_above"
+        value: 60000
+    actions:
+      - type: "log_only"  # 仅记录日志，不发送通知
+
+# ========================================
+# 条件类型说明
+# ========================================
+# price_above: 价格高于某个值
+# price_below: 价格低于某个值
+# price_range: 价格在某个区间内
+# percent_change: 价格变化百分比
+# price_spread: 跨交易所价差
+# volatility: 波动率
+# volume_spike: 交易量激增（待实现）
+
+# ========================================
+# 动作类型说明
+# ========================================
+# notify: 发送通知（支持telegram, lark, console）
+# sound: 播放声音
+# execute_bot: 执行交易机器人命令
+# webhook: 发送webhook通知
+# log_only: 仅记录日志
+
+# ========================================
+# 时间范围格式
+# ========================================
+# 5m = 5分钟
+# 1h = 1小时
+# 24h = 24小时
+# 7d = 7天
