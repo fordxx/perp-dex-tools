@@ -1,0 +1,81 @@
+# 套利监控系统配置示例
+
+# 交易所配置
+exchanges:
+  edgex:
+    name: "EdgeX"
+    maker_fee: 0.0002  # 0.02%
+    taker_fee: 0.0005  # 0.05%
+    withdrawal_fee: 0.0001
+    min_order_size: 10
+    max_order_size: 100000
+    supports_funding_rate: true
+    api_rate_limit: 100
+
+  lighter:
+    name: "Lighter"
+    maker_fee: 0.0001
+    taker_fee: 0.0004
+    withdrawal_fee: 0.0001
+    min_order_size: 10
+    max_order_size: 100000
+    supports_funding_rate: true
+    api_rate_limit: 100
+
+  backpack:
+    name: "Backpack"
+    maker_fee: 0.0002
+    taker_fee: 0.0005
+    withdrawal_fee: 0.0002
+    min_order_size: 10
+    max_order_size: 100000
+    supports_funding_rate: false
+    api_rate_limit: 50
+
+  apex:
+    name: "Apex"
+    maker_fee: 0.0002
+    taker_fee: 0.0005
+    withdrawal_fee: 0.0001
+    min_order_size: 10
+    max_order_size: 100000
+    supports_funding_rate: true
+    api_rate_limit: 100
+
+# 风险限制
+risk_limits:
+  # 仓位限制
+  max_position_size_usd: 10000  # 单次最大仓位
+  max_total_exposure_usd: 50000  # 总敞口限制
+  max_exchange_exposure_usd: 20000  # 单交易所敞口
+  max_symbol_exposure_usd: 15000  # 单币种敞口
+
+  # 利润和风险要求
+  min_profit_bps: 10  # 最小利润要求（基点）
+  max_risk_score: 70  # 最大风险评分
+  min_confidence_score: 60  # 最小置信度
+  min_liquidity_score: 50  # 最小流动性评分
+
+  # 执行参数
+  max_slippage_bps: 20  # 最大可接受滑点
+  max_data_latency_ms: 1000  # 最大数据延迟（毫秒）
+
+  # 交易限制
+  max_concurrent_trades: 3  # 最大并发交易数
+  max_daily_trades: 50  # 每日最大交易次数
+  max_daily_loss_usd: 1000  # 每日最大亏损
+
+# 监控配置
+monitor:
+  scan_interval: 2  # 扫描间隔（秒）
+  auto_execute: false  # 是否自动执行（false为模拟模式）
+  target_size_usd: 5000  # 目标交易规模
+  log_level: "INFO"  # 日志级别: DEBUG, INFO, WARNING, ERROR
+
+# 要监控的交易对
+symbols:
+  - "BTC-PERP"
+  - "ETH-PERP"
+  - "SOL-PERP"
+  - "ARB-PERP"
+  - "OP-PERP"
