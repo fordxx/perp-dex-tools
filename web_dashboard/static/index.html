@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Trading Dashboard - 实时监控仪表盘</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 Crypto Trading Dashboard</h1>
+                <div class="header-status">
+                    <span class="status-indicator" id="connectionStatus">
+                        <span class="status-dot offline"></span>
+                        <span class="status-text">离线</span>
+                    </span>
+                    <span class="last-update">最后更新: <span id="lastUpdate">--</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 统计卡片 -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <div class="stat-label">累计利润</div>
+                    <div class="stat-value" id="totalProfit">$0.00</div>
+                    <div class="stat-change positive">+0.00%</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-content">
+                    <div class="stat-label">套利机会</div>
+                    <div class="stat-value" id="opportunitiesCount">0</div>
+                    <div class="stat-change">实时监控中</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                    <div class="stat-label">执行交易</div>
+                    <div class="stat-value" id="totalTrades">0</div>
+                    <div class="stat-change">成功率: <span id="successRate">0%</span></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🔔</div>
+                <div class="stat-content">
+                    <div class="stat-label">价格提醒</div>
+                    <div class="stat-value" id="alertsTriggered">0</div>
+                    <div class="stat-change">已触发</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 主要内容 -->
+        <div class="main-content">
+            <!-- 左侧：套利机会 -->
+            <div class="left-panel">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>💎 套利机会</h2>
+                        <span class="badge" id="oppoBadge">0</span>
+                    </div>
+                    <div class="panel-content" id="arbitrageList">
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div class="empty-text">正在扫描套利机会...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📊 收益趋势</h2>
+                    </div>
+                    <div class="panel-content">
+                        <canvas id="profitChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：实时价格 -->
+            <div class="right-panel">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>💹 实时价格</h2>
+                        <button class="refresh-btn" onclick="refreshPrices()">🔄</button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="price-grid" id="priceGrid">
+                            <div class="empty-state">
+                                <div class="empty-icon">⏳</div>
+                                <div class="empty-text">正在加载价格数据...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>🔔 最近提醒</h2>
+                    </div>
+                    <div class="panel-content">
+                        <div class="alerts-list" id="alertsList">
+                            <div class="empty-state">
+                                <div class="empty-icon">🔕</div>
+                                <div class="empty-text">暂无提醒记录</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

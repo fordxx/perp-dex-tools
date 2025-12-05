@@ -228,6 +228,124 @@ python run_arbitrage.py --exchanges edgex backpack --tickers BTC --auto-execute 
 
 ---
 
+## 📊 Web 实时监控仪表盘 (Web Dashboard) - NEW!
+
+**全新功能**：现代化的实时监控仪表盘，让交易数据一目了然！
+
+### 界面预览
+
+🎨 **暗色主题**  |  📱 **响应式设计**  |  ⚡ **实时更新**
+
+### 核心功能
+
+- ✅ **实时价格监控** - 多交易所价格对比，自动更新
+- ✅ **套利机会展示** - 智能评分，高亮高质量机会
+- ✅ **收益统计图表** - 折线图实时展示利润增长
+- ✅ **提醒历史查看** - 所有触发的提醒一目了然
+- ✅ **WebSocket 推送** - 无需刷新，数据自动更新
+- ✅ **RESTful API** - 完整的 API 接口，易于集成
+
+### 快速开始
+
+**1. 安装依赖**
+```bash
+pip install fastapi uvicorn
+```
+
+**2. 启动仪表盘**
+```bash
+# 基础启动
+python run_dashboard.py
+
+# 同时启动套利引擎
+python run_dashboard.py --enable-arbitrage --exchanges edgex backpack --tickers BTC ETH
+```
+
+**3. 访问仪表盘**
+```
+浏览器打开: http://localhost:8000/dashboard
+API 文档: http://localhost:8000/docs
+```
+
+### 主要界面
+
+#### 1. 统计卡片
+实时展示四大核心指标：
+- 💰 累计利润：$1,847.32
+- 🎯 套利机会：3 个
+- 📈 执行交易：23 笔（成功率 95.7%）
+- 🔔 价格提醒：12 次触发
+
+#### 2. 套利机会面板
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💎 BTC 套利机会        评分: 85.3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+买入@EDGEX → 卖出@BACKPACK
+
+价差: $300 (0.47%)
+预估利润: $126.84 (0.20%) ✅
+买入价: $64,000    卖出价: $64,300
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+#### 3. 实时价格面板
+```
+┌─────────────────────────┐
+│ BTC          $64,250.00 │
+│ EDGEX            +2.3% ↑│
+├─────────────────────────┤
+│ ETH           $3,420.00 │
+│ BACKPACK         +1.8% ↑│
+└─────────────────────────┘
+```
+
+#### 4. 收益趋势图表
+实时折线图展示利润增长曲线
+
+### 高级功能
+
+#### API 接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/prices` | GET | 获取最新价格 |
+| `/api/arbitrage/opportunities` | GET | 获取套利机会 |
+| `/api/alerts/history` | GET | 获取提醒历史 |
+| `/api/statistics` | GET | 获取统计数据 |
+
+#### WebSocket 实时推送
+
+```javascript
+const ws = new WebSocket('ws://localhost:8000/ws');
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    // 实时数据自动推送
+};
+```
+
+### 移动设备访问
+
+```bash
+# 允许局域网访问
+python run_dashboard.py --host 0.0.0.0 --port 8000
+```
+
+在手机浏览器访问：`http://你的电脑IP:8000/dashboard`
+
+### 完整文档
+
+详细使用指南：[Web Dashboard 使用指南](docs/WEB_DASHBOARD_GUIDE.md)
+
+包含内容：
+- 📖 详细界面介绍
+- ⚙️ 配置选项说明
+- 📡 API 接口文档
+- 🔧 自定义和扩展
+- 🐛 问题排查指南
+
+---
+
 ## 邀请链接 (获得返佣以及福利)
 
 #### EdgeX: [https://pro.edgex.exchange/referral/QUANT](https://pro.edgex.exchange/referral/QUANT)
